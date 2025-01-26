@@ -2,6 +2,8 @@ from reward_sampling import RewardSampling
 import torch
 import json
 from tqdm import tqdm
+import time
+from datetime import datetime
 
 import os
 
@@ -15,6 +17,7 @@ rs = RewardSampling(
     # llm_dir="meta-llama/Llama-3.2-1B-Instruct",
     # rm_dir="/home/richardfan/ICML2025_RGTG/ICML_llama_1B_RMv1_TLDR_5e6",
     llm_dir="lomahony/eleuther-pythia2.8b-hh-sft",
+    rm_dir="/home/richardfan/ICML2025_RGTG/ICML_pythia_3b_RMv1_HH_5e6",
     device=device,
 )
 
@@ -24,13 +27,16 @@ with open("HH.json", "r") as f:
 
 # Create output file
 output_file = "generated_responses.jsonl"
+batch_start_time = datetime.now().strftime("%Y%m%d_%H%M%S")  # Batch ID using timestamp
+
+start_time = time.time()  # Start timer for this prompt
+
 
 with open(output_file, "w") as f:
     i = 0
     for prompt_dict in tqdm(prompts):
-        # print(f"prompt: {prompt.keys()} {prompt['prompt']}")
         prompt = prompt_dict["prompt"]
-        # Generate response using rs.rs_generate
+
         output, (reward, num_llm_call, num_rm_call) = rs.rs_generate(
             [prompt],
             max_new_token=128,
@@ -40,13 +46,18 @@ with open(output_file, "w") as f:
             # beta=0.7,
         )
 
+        elapsed_time = time.time() - start_time  # Calculate elapsed time
+
         # Save results
         result = {
+            "batch_id": batch_start_time,
+            "prompt_index": i,
             "prompt": prompt,
             "response": output[0],
             "reward": reward,
             "num_llm_call": num_llm_call,
             "num_rm_call": num_rm_call,
+            "elapsed_time": elapsed_time,
         }
 
         json.dump(result, f)
