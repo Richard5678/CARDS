@@ -46,8 +46,8 @@ def main():
         'batch_id', 
         nargs='?', 
         help='Batch ID to analyze', 
-        # default='20250126_002419', # HH
-        default='20250126_114834' # TLDR
+        # default='20250126_124451', # HH
+        default='20250126_123605' # TLDR
     )
     
     args = parser.parse_args()
