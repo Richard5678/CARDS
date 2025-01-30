@@ -61,7 +61,7 @@ class RewardSampling(BaseRewardSampling):
                 load_in_4bit=(fp_bit == 4),
                 device_map=device_map,
                 attn_implementation="flash_attention_2",
-            )
+            ).to(device)
             # self.RM = AutoModelForSequenceClassification.from_pretrained(
             #     rm_dir,
             #     num_labels=1,
